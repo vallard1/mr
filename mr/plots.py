@@ -120,7 +120,7 @@ def plot_traj(traj, colorby='probe', mpp=1, label=False, superimpose=None, cmap=
         except:
             pass
         else:
-            labels = ['probe {0}'.format(i) for i in traj.probe.unique()]
+            labels = ['particle {0}'.format(i) for i in traj.particle.unique()]
             for line, number in zip(lines, labels):
                 plugins.connect(fig,mpld3.plugins.LineLabelTooltip(line,number))
             mpld3.fig_to_d3(fig)

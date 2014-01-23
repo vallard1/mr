@@ -111,6 +111,22 @@ def imsd(traj, mpp, fps, max_lagtime=100, statistic='msd'):
     results.index.name = 'lag time [s]'
     return results
 
+def imsd_plot(imsd_results):
+
+    from mpld3 import plugins, fig_to_d3
+    fig, ax = plt.subplots()
+    labels = ['particle {0}'.format(i) for i in imsd_results.columns]
+    lines = ax.plot(imsd_results)
+    for line, label in zip(lines, labels):
+        plugins.connect(fig,mpld3.plugins.LineLabelTooltip(line,label))
+    mpld3.fig_to_d3(fig)
+    
+    ax.set_title('Individual MSD Plots')
+    plt.xscale('log')
+    plt.yscale('log')
+
+    return fig
+
 def emsd(traj, mpp, fps, max_lagtime=100, detail=False):
     """Compute the mean squared displacements of an ensemble of probes. 
     
