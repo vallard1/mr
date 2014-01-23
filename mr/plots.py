@@ -74,8 +74,7 @@ def make_fig(func):
     return wrapper
 
 @make_axes
-def plot_traj(traj, colorby='probe', mpp=1, label=False, superimpose=None, 
-       cmap=mpl.cm.winter, ax=None):
+def plot_traj(traj, colorby='probe', mpp=1, label=False, superimpose=None, cmap=mpl.cm.winter, ax=None):
     """Plot traces of trajectories for each probe.
     Optionally superimpose it on a frame from the video.
 
@@ -88,8 +87,7 @@ def plot_traj(traj, colorby='probe', mpp=1, label=False, superimpose=None,
     superimpose : background image, default None
     cmap : This is only used in colorby='frame' mode.
         Default = mpl.cm.winter
-    ax : matplotlib axes object, defaults to current axes
-
+        
     Returns
     -------
     None
@@ -97,7 +95,8 @@ def plot_traj(traj, colorby='probe', mpp=1, label=False, superimpose=None,
     if (superimpose is not None) and (mpp != 1):
         raise NotImplementedError("When superimposing over an image, you " +
                                   "must plot in units of pixels. Leave " +
-                                  "microns per pixel mpp=1.")
+                               "microns per pixel mpp=1.")
+    fig, ax = plt.subplots(1, 1)
     # Axes labels
     if mpp == 1:
         ax.set_xlabel('x [px]')
@@ -114,7 +113,18 @@ def plot_traj(traj, colorby='probe', mpp=1, label=False, superimpose=None,
     if colorby == 'probe':
         # Unstack probes into columns.
         unstacked = traj.set_index(['frame', 'probe']).unstack()
-        ax.plot(mpp*unstacked['x'], mpp*unstacked['y'], linewidth=1)
+        lines = ax.plot(mpp*unstacked['x'], mpp*unstacked['y'], linewidth=1)
+        
+        try:
+            from mpld3 import plugins,fig_to_d3
+        except:
+            pass
+        else:
+            labels = ['probe {0}'.format(i) for i in traj.probe.unique()]
+            for line, number in zip(lines, labels):
+                plugins.connect(fig,mpld3.plugins.LineLabelTooltip(line,number))
+            mpld3.fig_to_d3(fig)
+            
     if colorby == 'frame':
         # Read http://www.scipy.org/Cookbook/Matplotlib/MulticoloredLine 
         from matplotlib.collections import LineCollection
@@ -141,6 +151,7 @@ def plot_traj(traj, colorby='probe', mpp=1, label=False, superimpose=None,
                      horizontalalignment='center',
                      verticalalignment='center')
     ax.invert_yaxis()
+        
     return ax
 
 ptraj = plot_traj # convenience alias
