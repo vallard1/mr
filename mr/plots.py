@@ -116,14 +116,13 @@ def plot_traj(traj, colorby='probe', mpp=1, label=False, superimpose=None, cmap=
         lines = ax.plot(mpp*unstacked['x'], mpp*unstacked['y'], linewidth=1)
         
         try:
-            import mpld3
+            from mpld3 import plugins,fig_to_d3
         except:
             pass
         else:
             labels = ['probe {0}'.format(i) for i in traj.probe.unique()]
-            fig.plugins = []
             for line, number in zip(lines, labels):
-                fig.plugins.append(mpld3.plugins.LineLabelTooltip(line,number))
+                plugins.connect(fig,mpld3.plugins.LineLabelTooltip(line,number))
             mpld3.fig_to_d3(fig)
             
     if colorby == 'frame':
